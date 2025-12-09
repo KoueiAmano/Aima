@@ -1,37 +1,73 @@
-// app/history/page.tsx
-import Link from "next/link";
+"use client";
+
+import { useEffect, useState } from "react";
+import { getActivityLogs } from "@/lib/api";
+import type { ActivityLogForHistory } from "@/lib/types";
 
 export default function HistoryPage() {
+  const [logs, setLogs] = useState<ActivityLogForHistory[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+
+    getActivityLogs()
+      .then(({ activity_logs }) => setLogs(activity_logs))
+      .catch((e) => {
+        console.error(e);
+        setError("履歴の取得に失敗しました");
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  // 🔥 ローディング表示 — return のいちばん上でOK
+  if (loading) {
+    return (
+      <main style={{ padding: 24 }}>
+        履歴を読み込み中...
+      </main>
+    );
+  }
+
+  // 🔥 エラー表示 — ローディングの次に置く
+  if (error) {
+    return (
+      <main style={{ padding: 24 }}>
+        {error}
+      </main>
+    );
+  }
+
   return (
-    <main className="min-h-screen flex items-center justify-center bg-slate-100">
-      <div className="w-full max-w-lg rounded-xl bg-white shadow-md px-8 py-10 flex flex-col gap-6">
-        <h1 className="text-xl font-bold border-b pb-2">履歴画面</h1>
+    <main style={{ padding: 24 }}>
+      <h1>履歴</h1>
 
-        {/* ダミー履歴 */}
-        <div className="space-y-3 text-sm">
-          <div className="rounded-lg border border-slate-200 p-3">
-            <div className="font-medium">2025-12-08 / 15分 / まったり</div>
-            <div className="text-slate-500 text-xs">
-              レシピ：机の上だけ片付ける
-            </div>
-          </div>
-          <div className="rounded-lg border border-slate-200 p-3">
-            <div className="font-medium">2025-12-07 / 30分 / ワクワク</div>
-            <div className="text-slate-500 text-xs">
-              レシピ：気になっていた動画を1本だけ見る
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-4">
-          <Link
-            href="/"
-            className="inline-flex items-center rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50 transition"
-          >
-            ← ホームに戻る
-          </Link>
-        </div>
-      </div>
+      {logs.length === 0 ? (
+        <p>まだ履歴がありません。</p>
+      ) : (
+        <ul>
+          {logs.map((log) => (
+            <li key={log.id} style={{ marginBottom: 16 }}>
+              <h3>{log.recipe_title}</h3>
+              <p>
+                日時:{" "}
+                {new Date(log.executed_at).toLocaleString("ja-JP", {
+                  dateStyle: "short",
+                  timeStyle: "short",
+                })}
+              </p>
+              <p>
+                時間: {log.duration_min}分 / 気分: {log.mood} / 評価:
+                {log.feedback}
+              </p>
+              <p>天気: {log.weather}</p>
+              <p>{log.description}</p>
+            </li>
+          ))}
+        </ul>
+      )}
     </main>
   );
 }
