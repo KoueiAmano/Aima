@@ -37,31 +37,33 @@ export default function SelectPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-bg-grad-start via-bg-grad-mid to-bg-grad-end flex items-center justify-center px-4">
-      <div className="w-full max-w-[520px] rounded-3xl bg-card-bg shadow-[var(--color-card-shadow)] px-6 py-7 space-y-6 backdrop-blur-[2px]">
+    <main className="min-h-screen bg-gradient-to-b from-bg-grad-start via-bg-grad-mid to-bg-grad-end flex items-center justify-center px-4 py-10 sm:py-14 lg:py-12">
+      <div className="w-full max-w-[520px] md:max-w-[600px] lg:max-w-[680px] rounded-3xl bg-card-bg shadow-[var(--color-card-shadow)] px-5 sm:px-6 lg:px-8 py-7 sm:py-8 space-y-6 sm:space-y-7 backdrop-blur-[2px]">
         {/* ヘッダー */}
-        <header className="flex items-center justify-between">
-          <h1 className="text-lg font-semibold text-text-header">
+        <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <h1 className="text-base sm:text-lg lg:text-xl font-semibold text-text-header">
             今の気分をえらぶ
           </h1>
           <button
             type="button"
             onClick={() => router.push("/")}
-            className="text-xs text-text-main/70 underline-offset-2 hover:underline"
+            className="self-start sm:self-auto text-[11px] sm:text-xs text-text-main/70 underline-offset-2 hover:underline"
           >
             ホームにもどる
           </button>
         </header>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-7">
           {/* 時間 */}
           <section className="space-y-2">
-            <p className="text-xs font-semibold text-text-accent tracking-[0.18em] uppercase">
+            <p className="text-[10px] sm:text-xs font-semibold text-text-accent tracking-[0.18em] uppercase">
               STEP 1
             </p>
-            <p className="text-sm text-text-main">今の余白時間はどれくらい？</p>
+            <p className="text-sm sm:text-base text-text-main">
+              今の余白時間はどれくらい？
+            </p>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
               {timeOptions.map((t) => {
                 const selected = time === t;
                 return (
@@ -70,7 +72,7 @@ export default function SelectPage() {
                     type="button"
                     onClick={() => setTime(t)}
                     className={[
-                      "rounded-xl py-3 text-sm font-semibold transition border",
+                      "rounded-xl py-2.5 sm:py-3 text-sm sm:text-[15px] font-semibold transition border",
                       selected
                         ? "bg-primary/90 border-primary text-white shadow-md"
                         : "bg-white/80 border-primary-light text-text-main hover:bg-primary-light/60",
@@ -85,12 +87,14 @@ export default function SelectPage() {
 
           {/* 気分 */}
           <section className="space-y-2">
-            <p className="text-xs font-semibold text-text-accent tracking-[0.18em] uppercase">
+            <p className="text-[10px] sm:text-xs font-semibold text-text-accent tracking-[0.18em] uppercase">
               STEP 2
             </p>
-            <p className="text-sm text-text-main">今の気分に近いのはどれ？</p>
+            <p className="text-sm sm:text-base text-text-main">
+              今の気分に近いのはどれ？
+            </p>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
               {moodOptions.map((m) => {
                 const selected = mood === m.id;
                 return (
@@ -101,7 +105,7 @@ export default function SelectPage() {
                       setMood(m.id as "energetic" | "neutral" | "calm")
                     }
                     className={[
-                      "rounded-xl py-3 px-2 text-[11px] font-semibold transition border leading-snug",
+                      "rounded-xl py-2.5 sm:py-3 px-1.5 sm:px-2 text-[10px] sm:text-[11px] font-semibold transition border leading-snug",
                       selected
                         ? "bg-primary-border/95 border-primary-border text-white shadow-md"
                         : "bg-white/80 border-primary-light text-text-main hover:bg-primary-light/60",
@@ -116,14 +120,14 @@ export default function SelectPage() {
 
           {/* 過ごし方 */}
           <section className="space-y-2">
-            <p className="text-xs font-semibold text-text-accent tracking-[0.18em] uppercase">
+            <p className="text-[10px] sm:text-xs font-semibold text-text-accent tracking-[0.18em] uppercase">
               STEP 3
             </p>
-            <p className="text-sm text-text-main">
+            <p className="text-sm sm:text-base text-text-main">
               今日はどんな場所で過ごしたい？
             </p>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
               {placeOptions.map((p) => {
                 const selected = place === p.id;
                 return (
@@ -134,7 +138,7 @@ export default function SelectPage() {
                       setPlace(p.id as "indoor" | "both" | "outdoor")
                     }
                     className={[
-                      "rounded-xl py-3 px-2 text-[11px] font-semibold transition border leading-snug",
+                      "rounded-xl py-2.5 sm:py-3 px-1.5 sm:px-2 text-[10px] sm:text-[11px] font-semibold transition border leading-snug",
                       selected
                         ? "bg-chip-bg/95 border-chip-bg text-white shadow-md"
                         : "bg-white/80 border-primary-light text-text-main hover:bg-primary-light/60",
@@ -152,7 +156,7 @@ export default function SelectPage() {
             <button
               type="submit"
               disabled={!time}
-              className="min-w-[260px] rounded-full bg-gradient-to-r from-primary to-primary-border py-3.5 px-10 text-sm font-semibold text-white shadow-[0_18px_30px_rgba(232,155,83,0.5)] hover:brightness-105 hover:shadow-[0_20px_36px_rgba(232,155,83,0.65)] disabled:bg-gray-300 disabled:shadow-none disabled:cursor-not-allowed transition"
+              className="min-w-[240px] sm:min-w-[260px] rounded-full bg-gradient-to-r from-primary to-primary-border py-3 px-8 sm:py-3.5 sm:px-10 text-sm sm:text-[15px] font-semibold text-white shadow-[0_18px_30px_rgba(232,155,83,0.5)] hover:brightness-105 hover:shadow-[0_20px_36px_rgba(232,155,83,0.65)] disabled:bg-gray-300 disabled:shadow-none disabled:cursor-not-allowed transition"
             >
               この条件でレシピを見る
             </button>
