@@ -1,4 +1,3 @@
-// app/recipes/page.tsx
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
@@ -6,24 +5,24 @@ import { useEffect, useState } from "react";
 import { createRecommendation } from "@/lib/api";
 import type { Recipe, DurationMin, Mood } from "@/lib/types";
 
-type RecipesPageProps = {};
-
-// time の文字列を 15/30/60 に変換
 function parseDuration(time?: string | null): DurationMin {
   const n = Number(time);
-  if (n === 15 || n === 30 || n === 60) return n;
-  return 30;
+  return n === 15 || n === 30 || n === 60 ? n : 30;
 }
 
-// mood の文字列を型に変換
 function parseMood(mood?: string | null): Mood {
-  if (mood === "energetic" || mood === "neutral" || mood === "calm") {
-    return mood;
-  }
-  return "neutral";
+  return ["energetic", "neutral", "calm"].includes(mood ?? "")
+    ? (mood as Mood)
+    : "neutral";
 }
 
-export default function RecipesPage({}: RecipesPageProps) {
+const moodLabel: Record<Mood, string> = {
+  energetic: "元気に動きたい",
+  neutral: "ふつう・どちらでも",
+  calm: "ゆっくり落ち着きたい",
+};
+
+export default function RecipesPage() {
   const params = useSearchParams();
   const router = useRouter();
 
@@ -35,36 +34,24 @@ export default function RecipesPage({}: RecipesPageProps) {
   const [selectedRecipeId, setSelectedRecipeId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // レコメンドAPI（モック or 本番）を叩く
   useEffect(() => {
-    setLoading(true);
-    setError(null);
-
     createRecommendation({
       duration_min: duration,
       mood,
-      weather: "sunny", // とりあえず固定
+      weather: "sunny",
     })
       .then((res) => {
         setRecipes(res.recipes);
-        // 最初は何も選ばない（必要なら先頭をデフォルト選択でもOK）
-        setSelectedRecipeId(null);
+        setLoading(false);
       })
-      .catch((e) => {
-        console.error(e);
+      .catch(() => {
         setError("レシピの取得に失敗しました");
-      })
-      .finally(() => {
         setLoading(false);
       });
   }, [duration, mood]);
 
-  // 「決定」ボタンを押したときの処理
   const handleConfirm = () => {
-    if (selectedRecipeId == null) {
-      alert("レシピを1つ選んでください");
-      return;
-    }
+    if (!selectedRecipeId) return alert("レシピを1つ選んでください");
 
     const query = new URLSearchParams({
       recipeId: String(selectedRecipeId),
@@ -72,119 +59,136 @@ export default function RecipesPage({}: RecipesPageProps) {
       mood,
     });
 
-    router.push(`/review?${query.toString()}`);
+    router.push(`/review?${query}`);
   };
 
- if (loading) {
-  return (
-    <main
-      style={{
-        height: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: 18,
-        fontWeight: 600,
-      }}
-    >
-      🔄 おすすめプランを生成中...
-    </main>
-  );
-}
-
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-gradient-to-b from-bg-grad-start via-bg-grad-mid to-bg-grad-end flex items-center justify-center px-4">
+        <div className="w-full max-w-[420px] rounded-3xl bg-card-bg shadow-[var(--color-card-shadow)] px-6 py-7 text-center">
+          <p className="text-xs font-semibold tracking-[0.25em] text-text-accent mb-3">
+            RECIPE
+          </p>
+          <p className="text-sm text-text-main/80">
+            おすすめレシピを生成中です…
+          </p>
+        </div>
+      </main>
+    );
+  }
 
   if (error) {
     return (
-      <main style={{ padding: 24 }}>
-        <p>{error}</p>
+      <main className="min-h-screen bg-gradient-to-b from-bg-grad-start via-bg-grad-mid to-bg-grad-end flex items-center justify-center px-4">
+        <div className="w-full max-w-[420px] rounded-3xl bg-card-bg shadow-[var(--color-card-shadow)] px-6 py-7 text-center space-y-4">
+          <p className="text-xs font-semibold tracking-[0.25em] text-text-accent">
+            ERROR
+          </p>
+          <p className="text-sm text-red-500">{error}</p>
+          <button
+            type="button"
+            onClick={() => router.push("/select")}
+            className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-primary to-primary-border px-6 py-2.5 text-sm font-semibold text-white shadow-[0_14px_26px_rgba(232,155,83,0.5)] hover:brightness-105 transition"
+          >
+            条件をえらび直す
+          </button>
+        </div>
       </main>
     );
   }
 
   return (
-    <main style={{ padding: 24, maxWidth: 720, margin: "0 auto" }}>
-      <h1 style={{ marginBottom: 16 }}>あなたへの行動レシピ</h1>
+    <main className="min-h-screen bg-gradient-to-b from-bg-grad-start via-bg-grad-mid to-bg-grad-end flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-[520px] bg-card-bg shadow-[var(--color-card-shadow)] rounded-3xl p-7 space-y-6 backdrop-blur-[2px]">
+        {/* Header */}
+        <header className="flex items-center justify-between gap-3">
+          <div className="space-y-1">
+            <p className="text-xs font-semibold tracking-[0.25em] text-text-accent mb-1">
+              RECIPE
+            </p>
+            <h1 className="text-lg font-semibold text-text-header">
+              あなたへの行動レシピ
+            </h1>
+          </div>
+          <button
+            type="button"
+            onClick={() => router.push("/select")}
+            className="text-[11px] text-text-main/70 underline-offset-2 hover:underline"
+          >
+            条件をえらび直す
+          </button>
+        </header>
 
-      <section style={{ marginBottom: 24 }}>
-        <h2 style={{ fontSize: 16, marginBottom: 8 }}>今回の条件</h2>
-        <p style={{ fontSize: 14, color: "#555" }}>
-          時間：{duration} 分 / 気分：{mood}
-        </p>
-      </section>
+        {/* Condition */}
+        <section className="rounded-2xl bg-white/80 border border-primary-light px-4 py-3 text-xs text-text-main">
+          <p className="font-semibold text-text-accent tracking-[0.18em] text-[11px] mb-1 uppercase">
+            CONDITION
+          </p>
+          <p>
+            時間：{duration}分 / 気分：{moodLabel[mood]}
+          </p>
+        </section>
 
-      <section style={{ marginBottom: 24 }}>
-        <h2 style={{ fontSize: 16, marginBottom: 8 }}>レシピ候補</h2>
+        {/* Recipe List */}
+        <section>
+          <p className="text-xs font-semibold text-text-accent tracking-[0.18em] mb-3 uppercase">
+            RECOMMEND
+          </p>
 
-        <ul style={{ display: "grid", gap: 12, padding: 0, listStyle: "none" }}>
-          {recipes.map((recipe) => {
-            const isSelected = selectedRecipeId === recipe.id;
-            return (
-              <li key={recipe.id}>
-                <button
-                  type="button"
-                  onClick={() => setSelectedRecipeId(recipe.id)}
-                  style={{
-                    width: "100%",
-                    textAlign: "left",
-                    border: isSelected
-                      ? "2px solid #4f46e5"
-                      : "1px solid #ddd",
-                    borderRadius: 12,
-                    padding: 16,
-                    backgroundColor: isSelected ? "#eef2ff" : "#fff",
-                    cursor: "pointer",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      marginBottom: 8,
-                    }}
+          <ul className="space-y-3">
+            {recipes.map((recipe) => {
+              const selected = selectedRecipeId === recipe.id;
+
+              return (
+                <li key={recipe.id}>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedRecipeId(recipe.id)}
+                    className={[
+                      "w-full text-left rounded-2xl border p-4 transition shadow-sm hover:shadow-md",
+                      selected
+                        ? "border-primary-border bg-primary-light"
+                        : "border-primary-light/70 bg-white/90 hover:bg-bg-grad-start/70",
+                    ].join(" ")}
                   >
-                    <h3 style={{ margin: 0, fontSize: 16 }}>{recipe.title}</h3>
-                    <span
-                      style={{
-                        fontSize: 12,
-                        padding: "4px 8px",
-                        borderRadius: 999,
-                        backgroundColor: "#f3f4f6",
-                        color: "#4b5563",
-                      }}
-                    >
-                      {recipe.category}
-                    </span>
-                  </div>
-                  <p style={{ fontSize: 14, color: "#374151", margin: 0 }}>
-                    {recipe.description}
-                  </p>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      </section>
+                    <div className="flex items-center justify-between mb-2 gap-3">
+                      <h3 className="text-sm font-semibold text-text-main">
+                        {recipe.title}
+                      </h3>
+                      {recipe.category && (
+                        <span className="bg-chip-bg text-chip-text text-[11px] px-3 py-1 rounded-full">
+                          {recipe.category}
+                        </span>
+                      )}
+                    </div>
+                    {recipe.description && (
+                      <p className="text-xs text-text-main/80 leading-relaxed">
+                        {recipe.description}
+                      </p>
+                    )}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
 
-      <div style={{ textAlign: "center" }}>
-        <button
-          type="button"
-          onClick={handleConfirm}
-          disabled={selectedRecipeId == null}
-          style={{
-            minWidth: 200,
-            padding: "10px 20px",
-            borderRadius: 999,
-            border: "none",
-            backgroundColor:
-              selectedRecipeId == null ? "#d1d5db" : "#4f46e5",
-            color: "#fff",
-            cursor: selectedRecipeId == null ? "not-allowed" : "pointer",
-            fontWeight: 600,
-          }}
-        >
-          このレシピでレビューへ進む
-        </button>
+        {/* Confirm Button */}
+        <div className="text-center pt-4">
+          <button
+            type="button"
+            onClick={handleConfirm}
+            disabled={!selectedRecipeId}
+            className={[
+              "min-w-[260px] rounded-full py-3.5 px-10 font-semibold text-sm transition",
+              selectedRecipeId
+                ? "bg-gradient-to-r from-primary to-primary-border text-white shadow-[0_18px_30px_rgba(232,155,83,0.5)] hover:brightness-110 hover:shadow-[0_20px_36px_rgba(232,155,83,0.65)]"
+                : "bg-gray-300 text-white cursor-not-allowed",
+            ].join(" ")}
+          >
+            このレシピでレビューへ進む
+          </button>
+        </div>
       </div>
     </main>
   );
