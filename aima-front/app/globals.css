@@ -1,168 +1,31 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* globals.css */
 
-/* ここから下は自分のカスタムCSS */
+@import "tailwindcss";
 
-/* ライト／ダークの色変数 */
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  /* ===== 背景グラデーション（最初のコードと同じ色） ===== */
+  --color-bg-grad-start: #fff5ea; /* from: ちょっと濃いクリーム */
+  --color-bg-grad-mid:   #fff9f2; /* via: ほぼ白に近いクリーム */
+  --color-bg-grad-end:   #fffbf6; /* to: やわらかい白クリーム */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+  /* ===== テキストカラー ===== */
+  --color-text-main:    #9d7d65; /* 説明文や本文用（前のサブテキストの色） */
+  --color-text-header:  #a66e4e; /* 見出し「余白時間を、」のブラウン */
+  --color-text-accent:  #c49a6c; /* 上の「FREETIME」ロゴ用のアクセント */
 
-/* 全体のベース */
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+  /* ===== カード系（今後コンポーネントで使う用） ===== */
+  --color-card-bg: #ffffffcc;         /* 80% white の半透明カード */
+  --color-card-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
 
-/* 画面全体のセンタリング（ホームなどで使用） */
-.page {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #f5f5f5;
-}
+  /* ===== ボタンまわり ===== */
+  /* 1つめのボタン「今の気分からはじめる」 = オレンジグラデ */
+  --color-primary:        #e89b53; /* 左側のオレンジ */
+  --color-primary-border: #e08244; /* 右側の少し濃いオレンジ */
 
-/* 真ん中の白い箱（ホーム画面の枠） */
-.card {
-  width: 320px;
-  padding: 24px 32px;
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
+  /* 2つめのボタン「最近のレシピを見る」 = 黄色グラデ風 */
+  --color-chip-bg:   #eac563; /* 左側のゴールド寄りイエロー */
+  --color-chip-text: #a86f3b; /* 中の文字色（ちょい濃いブラウン） */
 
-/* ヘッダー（アプリ名） */
-.title {
-  font-size: 20px;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 8px;
-}
-
-/* ボタン */
-.button {
-  padding: 12px 16px;
-  border: 1px solid #cccccc;
-  border-radius: 6px;
-  background: #ffffff;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-/* メインの「開始ボタン」だけ少し強調 */
-.main-button {
-  background: #f0f8ff;
-  border-color: #87cefa;
-}
-
-.button:hover {
-  opacity: 0.9;
-}
-
-/* select 画面全体 */
-.select-page {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #f5f5f5;
-}
-
-/* select の白いカード */
-.select-card {
-  width: 720px;
-  max-width: 100%;
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 24px 32px 32px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
-}
-
-/* ヘッダー */
-.select-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.select-title {
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.back-button {
-  padding: 8px 16px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background: #fff;
-  text-decoration: none;
-  color: #333;
-}
-
-/* 質問ブロック */
-.question-block {
-  margin-bottom: 24px;
-}
-
-.question-label {
-  margin-bottom: 12px;
-  font-size: 14px;
-  color: #444;
-}
-
-/* 各行の3択ボタン */
-.option-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-}
-
-.option-button {
-  padding: 14px 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background: #fff;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-/* 選択されたときの見た目（MBTIぽく色を変える） */
-.option-button--selected {
-  border-color: #4f46e5;
-  background: #eef2ff;
-  font-weight: 600;
-}
-
-/* 決定ボタン */
-.submit-row {
-  display: flex;
-  justify-content: center;
-  margin-top: 12px;
-}
-
-.submit-button {
-  min-width: 200px;
-  padding: 12px 20px;
-  border-radius: 999px;
-  border: none;
-  background: #4f46e5;
-  color: #fff;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
+  /* 3つめのボタンや薄いアクセント用のハイライトカラー */
+  --color-primary-light: #ffe3d7; /* やわらかい薄オレンジ */
 }

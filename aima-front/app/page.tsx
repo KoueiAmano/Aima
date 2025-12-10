@@ -3,73 +3,64 @@ import Link from "next/link";
 
 export default function HomePage() {
   return (
-    // 背景：中心からふわっと広がる光のようなグラデーション
-    <main className="min-h-screen flex items-center justify-center px-6 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#fff5ea] via-[#fff9f2] to-[#fffbf6]">
-      <div className="relative w-full max-w-[400px] text-center py-10">
-        
-        {/* ロゴ：文字間隔を広げて抜け感を出す */}
-        <p className="text-[12px] font-bold tracking-[0.3em] text-[#c49a6c] mb-6 opacity-90">
+    // 画面全体：ふんわり縦グラデ + 中央寄せ
+    <main className="min-h-screen bg-gradient-to-b from-bg-grad-start via-bg-grad-mid to-bg-grad-end flex items-center justify-center px-4">
+      {/* 内側カード：少し小さめの幅 + 角丸 + 影でカードっぽく */}
+      <div className="relative w-full max-w-[420px] text-center rounded-3xl bg-card-bg shadow-[0_18px_40px_rgba(0,0,0,0.08)] px-7 py-9 backdrop-blur-[2px]">
+        {/* 小さなラベル（ロゴ的役割） */}
+        <p className="text-[11px] font-semibold tracking-[0.35em] text-text-accent mb-4">
           FREETIME
         </p>
 
-        {/* メインタイトル：濃いブラウンで引き締めつつ、やわらかい印象に */}
-        <h1 className="mb-6 text-[32px] leading-tight font-bold text-[#a66e4e]">
+        {/* 大見出し：ブラウンで締める */}
+        <h1 className="mb-4 text-[30px] leading-snug font-bold text-text-header">
           余白時間を、
           <br />
-          <span className="text-[36px]">ちょっと良い時間に。</span>
+          <span className="text-[34px]">ちょっと良い時間に。</span>
         </h1>
 
-        {/* サブテキスト */}
-        <p className="mb-14 text-[13px] leading-7 text-[#9d7d65] font-medium">
-          15 / 30 / 60分のすきま時間に、<br/>
-          今の気分に合う「行動レシピ」を提案します。
+        {/* 説明文：本文用の落ち着いたブラウン + 少し薄く */}
+        <p className="mb-10 text-xs leading-relaxed text-text-main/80">
+          15 / 30 / 60分のすきま時間に、今の気分に合う「行動レシピ」を提案します。
         </p>
 
-        {/* --- ボタンエリア --- */}
-        <div className="space-y-8 mb-16 px-2">
-          
-          {/* 1. 今の気分からはじめる (オレンジ) */}
-          <Link href="/select" className="block group relative">
-            <div className="relative z-10 mx-auto w-full">
-              {/* ボタン本体 */}
-              <div className="
-                relative flex items-center justify-center 
-                rounded-full py-5 px-4
-                bg-gradient-to-r from-[#e89b53] to-[#e08244] 
-                text-white font-bold tracking-wide text-[17px]
-                /* 影の設定：下に落ちる影(オレンジ色) + 上部の白い反射(inset)でぷっくり感を出す */
-                shadow-[0_15px_30px_-5px_rgba(232,155,83,0.5),inset_0_2px_4px_rgba(255,255,255,0.3)]
-                transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-[0_20px_40px_-5px_rgba(232,155,83,0.6),inset_0_2px_4px_rgba(255,255,255,0.3)]
-              ">
-                今の気分からはじめる
-              </div>
-              
-            
+        {/* ボタンたち（縦にゆったり並べる） */}
+        <div className="space-y-6 mb-10">
+          {/* 1. 今の気分からはじめる（メインボタン：オレンジグラデ） */}
+          <Link href="/select" className="block">
+            <div className="relative mx-auto flex max-w-[380px] items-center justify-center gap-3 rounded-full bg-gradient-to-r from-primary to-primary-border px-14 py-5 text-[15px] font-semibold text-white shadow-[0_18px_36px_rgba(232,155,83,0.55)] transition-transform transition-shadow duration-200 hover:brightness-110 hover:translate-y-[1px] hover:shadow-[0_22px_42px_rgba(232,155,83,0.65)]">
+              <span>今の気分からはじめる</span>
+              <span className="text-2xl" aria-hidden>
+                📖
+              </span>
             </div>
           </Link>
 
-          {/* 2. 最近のレシピを見る (イエロー) */}
-          <Link href="/history" className="block group relative">
-            <div className="relative z-10 mx-auto w-full">
-              <div className="
-                relative flex items-center justify-center 
-                rounded-full py-5 px-4
-                bg-gradient-to-r from-[#eac563] to-[#e2b14f] 
-                text-white font-bold tracking-wide text-[17px]
-                shadow-[0_15px_30px_-5px_rgba(226,177,79,0.5),inset_0_2px_4px_rgba(255,255,255,0.3)]
-                transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-[0_20px_40px_-5px_rgba(226,177,79,0.6),inset_0_2px_4px_rgba(255,255,255,0.3)]
-              ">
-                最近のレシピを見る
-              </div>
-
+          {/* 2. 最近のレシピを見る（サブボタン：ゴールド〜クリーム系） */}
+          <Link href="/history" className="block">
+            <div className="relative mx-auto flex max-w-[380px] items-center justify-center gap-3 rounded-full bg-gradient-to-r from-chip-bg to-primary-light px-14 py-5 text-[15px] font-semibold text-chip-text shadow-[0_18px_36px_rgba(245,225,199,0.7)] transition-transform transition-shadow duration-200 hover:brightness-110 hover:translate-y-[1px] hover:shadow-[0_22px_42px_rgba(245,225,199,0.85)]">
+              <span>最近のレシピを見る</span>
+              <span className="text-2xl" aria-hidden>
+                ☕️
+              </span>
             </div>
           </Link>
-         
+
+          {/* 3. 条件をえらび直す（淡い色の三番目ボタン） */}
+          <Link href="/select" className="block">
+            <div className="relative mx-auto flex max-w-[380px] items-center justify-center gap-3 rounded-full bg-primary-light px-14 py-5 text-[15px] font-semibold text-text-main shadow-[0_18px_36px_rgba(255,227,215,0.8)] transition-transform transition-shadow duration-200 hover:brightness-105 hover:translate-y-[1px] hover:shadow-[0_22px_42px_rgba(255,227,215,0.95)]">
+              <span>条件をえらび直す</span>
+              <span className="text-2xl" aria-hidden>
+                🛋️
+              </span>
+            </div>
+          </Link>
         </div>
 
-        {/* フッターテキスト */}
-        <p className="text-[10px] leading-relaxed text-[#b09680] opacity-80">
-          気分が乗らないときは、5分だけでもOK。<br />
+        {/* 下の小さい説明文：かなり控えめなトーン */}
+        <p className="text-[11px] leading-relaxed text-text-main/70">
+          気分が乗らないときは、5分だけでもOK。
+          <br />
           「ちょっとやってみる」を増やすための、小さな相棒アプリです。
         </p>
       </div>

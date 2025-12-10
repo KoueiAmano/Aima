@@ -27,6 +27,12 @@ const feedbackOptions: { id: Feedback; label: string }[] = [
   { id: "bad", label: "いまいち" },
 ];
 
+const moodLabel: Record<Mood, string> = {
+  energetic: "元気に動きたい",
+  neutral: "ふつう・どちらでも",
+  calm: "ゆっくり落ち着きたい",
+};
+
 export default function ReviewPage() {
   const router = useRouter();
   const params = useSearchParams();
@@ -38,10 +44,17 @@ export default function ReviewPage() {
   // 必須パラメータが欠けていたらエラー表示
   if (!recipeIdParam) {
     return (
-      <main style={{ padding: 24 }}>
-        <h1>評価画面</h1>
-        <p>レシピが選択されていません。</p>
-        <button onClick={() => router.push("/")}>ホームに戻る</button>
+      <main className="min-h-screen bg-gradient-to-b from-bg-grad-start via-bg-grad-mid to-bg-grad-end flex items-center justify-center px-4">
+        <div className="w-full max-w-[420px] rounded-3xl bg-card-bg shadow-[var(--color-card-shadow)] px-6 py-7 text-center space-y-4">
+          <h1 className="text-lg font-semibold text-text-header">評価画面</h1>
+          <p className="text-sm text-text-main/80">レシピが選択されていません。</p>
+          <button
+            onClick={() => router.push("/")}
+            className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-primary to-primary-border px-6 py-2.5 text-sm font-semibold text-white shadow-[0_14px_26px_rgba(232,155,83,0.5)] hover:brightness-105 transition"
+          >
+            ホームに戻る
+          </button>
+        </div>
       </main>
     );
   }
@@ -65,83 +78,117 @@ export default function ReviewPage() {
     setSubmitting(true);
     setError(null);
 
-      try {
-    await createActivityLog({
-      recipe_id: recipeId,
-      mood,
-      duration_min: duration,
-      weather: "sunny", // とりあえず固定値。あとで変えたければ変えられる
-      feedback: selectedFeedback,
-    });
+    try {
+      await createActivityLog({
+        recipe_id: recipeId,
+        mood,
+        duration_min: duration,
+        weather: "sunny", // とりあえず固定値
+        feedback: selectedFeedback,
+      });
 
-    // ✅ 送信後はホーム画面に戻る
-    router.push("/");
-  } catch (e) {
-    console.error(e);
-    setError("送信に失敗しました。時間をおいて再度お試しください。");
-    setSubmitting(false);
-  }
-
+      router.push("/");
+    } catch (e) {
+      console.error(e);
+      setError("送信に失敗しました。時間をおいて再度お試しください。");
+      setSubmitting(false);
+    }
   };
 
   return (
-    <main style={{ padding: 24, maxWidth: 600, margin: "0 auto" }}>
-      <h1 style={{ marginBottom: 16 }}>今回のレシピの評価</h1>
+    <main className="min-h-screen bg-gradient-to-b from-bg-grad-start via-bg-grad-mid to-bg-grad-end flex items-center justify-center px-4">
+      <div className="w-full max-w-[520px] rounded-3xl bg-card-bg shadow-[var(--color-card-shadow)] px-6 py-7 space-y-6 backdrop-blur-[2px]">
+        {/* ヘッダー */}
+        <header className="flex items-center justify-between">
+          <div className="space-y-1">
+            <p className="text-[11px] font-semibold tracking-[0.2em] text-text-accent uppercase">
+              REVIEW
+            </p>
+            <h1 className="text-lg font-semibold text-text-header">
+              今回のレシピの評価
+            </h1>
+          </div>
+          <button
+            type="button"
+            onClick={() => router.push("/")}
+            className="text-xs text-text-main/70 underline-offset-2 hover:underline"
+          >
+            ホームにもどる
+          </button>
+        </header>
 
-      <section style={{ marginBottom: 24 }}>
-        <h2 style={{ fontSize: 16, marginBottom: 8 }}>今回の条件</h2>
-        <ul style={{ fontSize: 14, color: "#555" }}>
-          <li>時間：{duration} 分</li>
-          <li>気分：{mood}</li>
-          {/* 必要なら recipes からタイトルをクエリで渡して表示してもOK */}
-        </ul>
-      </section>
+        {/* 今回の条件 */}
+        <section className="space-y-2">
+          <p className="text-xs font-semibold text-text-accent tracking-[0.18em] uppercase">
+            CONDITION
+          </p>
+          <div className="rounded-2xl bg-white/80 border border-primary-light px-4 py-3 text-left text-xs text-text-main/90">
+            <ul className="space-y-1">
+              <li>
+                <span className="font-semibold">時間：</span>
+                {duration} 分
+              </li>
+              <li>
+                <span className="font-semibold">気分：</span>
+                {moodLabel[mood]}
+              </li>
+              {/* レシピタイトルなどを追加したくなったらここに */}
+            </ul>
+          </div>
+        </section>
 
-      <section style={{ marginBottom: 24 }}>
-        <h2 style={{ fontSize: 16, marginBottom: 8 }}>どうだった？</h2>
-        <div style={{ display: "flex", gap: 12 }}>
-          {feedbackOptions.map((opt) => (
-            <button
-              key={opt.id}
-              type="button"
-              onClick={() => setSelectedFeedback(opt.id)}
-              style={{
-                padding: "10px 16px",
-                borderRadius: 8,
-                border:
-                  selectedFeedback === opt.id
-                    ? "2px solid #4f46e5"
-                    : "1px solid #ccc",
-                backgroundColor:
-                  selectedFeedback === opt.id ? "#eef2ff" : "#fff",
-                cursor: "pointer",
-              }}
-            >
-              {opt.label}
-            </button>
-          ))}
+        {/* 評価選択 */}
+        <section className="space-y-3">
+          <p className="text-xs font-semibold text-text-accent tracking-[0.18em] uppercase">
+            FEEDBACK
+          </p>
+          <p className="text-sm text-text-main">今回のレシピ、どうだった？</p>
+
+          <div className="flex flex-wrap gap-3">
+            {feedbackOptions.map((opt) => {
+              const selected = selectedFeedback === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => setSelectedFeedback(opt.id)}
+                  className={[
+                    "rounded-full px-4 py-2 text-xs font-semibold transition border",
+                    selected
+                      ? "bg-primary-border/95 border-primary-border text-white shadow-md"
+                      : "bg-white/80 border-primary-light text-text-main hover:bg-primary-light/60",
+                  ].join(" ")}
+                >
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* エラー表示 */}
+        {error && (
+          <p className="text-xs text-red-500 bg-red-50 border border-red-100 rounded-xl px-3 py-2">
+            {error}
+          </p>
+        )}
+
+        {/* 決定ボタン */}
+        <div className="pt-2 flex justify-center">
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={submitting}
+            className={`min-w-[260px] rounded-full py-3.5 px-10 text-sm font-semibold shadow-[0_18px_30px_rgba(232,155,83,0.5)] transition hover:brightness-105 hover:shadow-[0_20px_36px_rgba(232,155,83,0.65)] ${
+              submitting
+                ? "bg-gray-300 text-white shadow-none cursor-default"
+                : "bg-gradient-to-r from-primary to-primary-border text-white"
+            }`}
+          >
+            {submitting ? "送信中..." : "この評価で保存する"}
+          </button>
         </div>
-      </section>
-
-      {error && (
-        <p style={{ color: "red", fontSize: 14, marginBottom: 12 }}>{error}</p>
-      )}
-
-      <button
-        type="button"
-        onClick={handleSubmit}
-        disabled={submitting}
-        style={{
-          padding: "10px 20px",
-          borderRadius: 999,
-          border: "none",
-          backgroundColor: submitting ? "#cbd5f5" : "#4f46e5",
-          color: "#fff",
-          cursor: submitting ? "default" : "pointer",
-        }}
-      >
-        {submitting ? "送信中..." : "この評価で保存する"}
-      </button>
+      </div>
     </main>
   );
 }
