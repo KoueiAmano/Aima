@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  recipe: one
+  mood: 1
+  feedback: 1
+  weather: 1
+  duration_min: 1
+
+two:
+  user: two
+  recipe: two
+  mood: 1
+  feedback: 1
+  weather: 1
+  duration_min: 1
