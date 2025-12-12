@@ -4,6 +4,7 @@
 export type Personality = "energetic" | "neutral" | "calm";
 export type Preference = "outdoor" | "both" | "indoor";
 export type Mood = "energetic" | "neutral" | "calm";
+export type Weather = "sunny" | "rainy" | "cloudy";
 export type Feedback = "good" | "normal" | "bad";
 export type DurationMin = 15 | 30 | 60;
 
@@ -35,7 +36,7 @@ export type ActivityLogCreated = {
   mood: Mood;
   feedback: Feedback;
   duration_min: DurationMin;
-  weather: string;
+  weather: Weather;
   executed_at: string; // ISO文字列
 };
 
@@ -49,7 +50,7 @@ export type ActivityLogForHistory = {
   mood: Mood;
   feedback: Feedback;
   duration_min: DurationMin;
-  weather: string;
+  weather: Weather;
   executed_at: string; // ISO文字列
 };
 

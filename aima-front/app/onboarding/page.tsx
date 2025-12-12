@@ -5,18 +5,8 @@ import { useRouter } from "next/navigation";
 import { createUser } from "@/lib/api";
 import { setUserId } from "@/lib/userStore";
 import type { Personality, Preference } from "@/lib/types";
-
-const personalityOptions: { id: Personality; label: string }[] = [
-  { id: "energetic", label: "元気に動きたい" },
-  { id: "neutral", label: "ふつう・どちらでも" },
-  { id: "calm", label: "ゆっくり落ち着きたい" },
-];
-
-const preferenceOptions: { id: Preference; label: string }[] = [
-  { id: "outdoor", label: "外に出るのが好き" },
-  { id: "both", label: "どちらも好き" },
-  { id: "indoor", label: "おうちが好き" },
-];
+import { personalityOptions, preferenceOptions } from "@/lib/options";
+import { OptionGrid } from "@/components/ui/OptionGrid";
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -48,8 +38,11 @@ export default function OnboardingPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-bg-grad-start via-bg-grad-mid to-bg-grad-end flex items-center justify-center px-4 py-10 sm:py-14 lg:py-12">
-      <div className="w-full max-w-[520px] md:max-w-[600px] rounded-3xl bg-card-bg shadow-[var(--color-card-shadow)] backdrop-blur-[2px] px-6 sm:px-7 py-7 sm:py-8 space-y-6 sm:space-y-7">
+    <>
+      {/* Page shell + card wrapper */}
+      <div className="min-h-screen bg-gradient-to-b from-bg-grad-start via-bg-grad-mid to-bg-grad-end flex items-center justify-center px-4 py-10 sm:py-14 lg:py-12">
+        <div className="w-full max-w-[520px] md:max-w-[600px]">
+          <div className="rounded-3xl bg-card-bg shadow-[var(--color-card-shadow)] backdrop-blur-[2px] px-6 sm:px-7 py-7 sm:py-8 space-y-6 sm:space-y-7">
         {/* Header */}
         <header className="text-center space-y-2">
           <p className="text-[10px] sm:text-[11px] font-semibold tracking-[0.25em] text-text-accent uppercase">
@@ -90,26 +83,12 @@ export default function OnboardingPage() {
               普段の気分タイプは？
             </p>
 
-            <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
-              {personalityOptions.map((opt) => {
-                const selected = personality === opt.id;
-                return (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    onClick={() => setPersonality(opt.id)}
-                    className={[
-                      "rounded-xl py-2.5 sm:py-3 px-2 text-[10px] sm:text-[11px] font-semibold transition border leading-snug",
-                      selected
-                        ? "bg-primary-border/95 border-primary-border text-white shadow-md"
-                        : "bg-white/80 border-primary-light text-text-main hover:bg-primary-light/60",
-                    ].join(" ")}
-                  >
-                    {opt.label}
-                  </button>
-                );
-              })}
-            </div>
+            <OptionGrid
+              options={personalityOptions}
+              selected={personality}
+              onSelect={(v) => setPersonality(v)}
+              itemClassName="rounded-xl py-2.5 sm:py-3 px-2 text-[10px] sm:text-[11px] font-semibold leading-snug"
+            />
           </section>
 
           {/* preference */}
@@ -121,26 +100,12 @@ export default function OnboardingPage() {
               過ごし方の傾向は？
             </p>
 
-            <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
-              {preferenceOptions.map((opt) => {
-                const selected = preference === opt.id;
-                return (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    onClick={() => setPreference(opt.id)}
-                    className={[
-                      "rounded-xl py-2.5 sm:py-3 px-2 text-[10px] sm:text-[11px] font-semibold transition border leading-snug",
-                      selected
-                        ? "bg-chip-bg/95 border-chip-bg text-white shadow-md"
-                        : "bg-white/80 border-primary-light text-text-main hover:bg-primary-light/60",
-                    ].join(" ")}
-                  >
-                    {opt.label}
-                  </button>
-                );
-              })}
-            </div>
+            <OptionGrid
+              options={preferenceOptions}
+              selected={preference}
+              onSelect={(v) => setPreference(v)}
+              itemClassName="rounded-xl py-2.5 sm:py-3 px-2 text-[10px] sm:text-[11px] font-semibold leading-snug"
+            />
           </section>
 
           {/* エラー */}
@@ -165,7 +130,9 @@ export default function OnboardingPage() {
             </button>
           </div>
         </form>
+          </div>
+        </div>
       </div>
-    </main>
+    </>
   );
 }

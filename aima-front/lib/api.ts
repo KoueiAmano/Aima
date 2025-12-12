@@ -20,6 +20,7 @@ const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === "true";
 // 共通 requestJson
 // ========================
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+console.log("API_BASE =", API_BASE);
 
 async function requestJson<T>(
   path: string,
@@ -69,7 +70,7 @@ export async function createUser(params: {
 export async function createRecommendation(params: {
   mood: Mood;
   duration_min: DurationMin;
-  weather?: string;
+  weather?: import("./types").Weather;
 }): Promise<RecommendationResponse> {
   if (USE_MOCK) {
     return createRecommendationMock();
@@ -89,7 +90,7 @@ export async function createActivityLog(params: {
   recipe_id: number;
   mood: Mood;
   duration_min: DurationMin;
-  weather?: string;
+  weather?: import("./types").Weather;
   feedback: Feedback;
 }): Promise<ActivityLogCreated> {
   if (USE_MOCK) return createActivityLogMock(params);
@@ -171,7 +172,7 @@ async function createActivityLogMock(params: {
   recipe_id: number;
   mood: Mood;
   duration_min: DurationMin;
-  weather?: string;
+  weather?: import("./types").Weather;
   feedback: Feedback;
 }): Promise<ActivityLogCreated> {
   await new Promise((r) => setTimeout(r, 600));
@@ -199,4 +200,37 @@ export async function getActivityLogs(): Promise<ActivityLogsResponse> {
   return requestJson<ActivityLogsResponse>("/api/v1/activity_logs", {
     method: "GET",
   });
+}
+
+
+// ヘルスチェックのレスポンス型定義
+export type HealthCheckResponse = {
+  status: string;
+  time: string;
+};
+
+// ヘルスチェック実行関数
+export async function checkHealth(): Promise<HealthCheckResponse> {
+  // モックモードなら固定レスポンス
+  if (USE_MOCK) {
+    return { status: "ok (mock)", time: new Date().toISOString() };
+  }
+
+  // ✅ ここは API_BASE 経由にしない！
+  // ブラウザからは Next の Route Handler (/api/health) だけ叩く
+  const res = await fetch("/api/health", {
+    method: "GET",
+    cache: "no-store",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    console.error("Health check error", res.status, text);
+    throw new Error(`Health check failed: ${res.status}`);
+  }
+
+  return res.json();
 }
