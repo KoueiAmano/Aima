@@ -19,22 +19,36 @@ const placeOptions = [
 export default function SelectPage() {
   const router = useRouter();
 
-  const [time, setTime] = useState<number | null>(30);
-  const [mood, setMood] = useState<"energetic" | "neutral" | "calm">("neutral");
-  const [place, setPlace] = useState<"indoor" | "both" | "outdoor">("both");
+  // 最初は「未選択」にしておく
+  const [time, setTime] = useState<number | null>(null);
+  const [mood, setMood] = useState<"energetic" | "neutral" | "calm" | null>(
+    null
+  );
+  const [weather, setWeather] = useState<"indoor" | "both" | "outdoor" | null>(
+    null
+  );
+
+  // 「送信ボタン押した後にエラーを見せる」ためのフラグ
+  const [showErrors, setShowErrors] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!time) return;
+    setShowErrors(true);
+
+    // どれか一つでも未選択ならここでストップ
+    if (!time || !mood || !weather) return;
 
     const params = new URLSearchParams({
-      time: String(time),
+      duration_min: String(time),
       mood,
-      // place は今は使わないけど、あとでAPIに渡したくなったらここに追加できる
+      // weather は今はAPIでは使ってない前提ならコメントアウトでもOK
+      // weather,
     });
 
     router.push(`/recipes?${params.toString()}`);
   };
+
+  const hasError = !time || !mood || !weather;
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-bg-grad-start via-bg-grad-mid to-bg-grad-end flex items-center justify-center px-4 py-10 sm:py-14 lg:py-12">
@@ -83,6 +97,12 @@ export default function SelectPage() {
                 );
               })}
             </div>
+
+            {showErrors && !time && (
+              <p className="text-[11px] sm:text-xs text-red-500 mt-1">
+                時間を1つえらんでください。
+              </p>
+            )}
           </section>
 
           {/* 気分 */}
@@ -116,6 +136,12 @@ export default function SelectPage() {
                 );
               })}
             </div>
+
+            {showErrors && !mood && (
+              <p className="text-[11px] sm:text-xs text-red-500 mt-1">
+                気分を1つえらんでください。
+              </p>
+            )}
           </section>
 
           {/* 過ごし方 */}
@@ -124,18 +150,18 @@ export default function SelectPage() {
               STEP 3
             </p>
             <p className="text-sm sm:text-base text-text-main">
-              今日はどんな場所で過ごしたい？
+              今日の天気は？
             </p>
 
             <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
               {placeOptions.map((p) => {
-                const selected = place === p.id;
+                const selected = weather === p.id;
                 return (
                   <button
                     key={p.id}
                     type="button"
                     onClick={() =>
-                      setPlace(p.id as "indoor" | "both" | "outdoor")
+                      setWeather(p.id as "indoor" | "both" | "outdoor")
                     }
                     className={[
                       "rounded-xl py-2.5 sm:py-3 px-1.5 sm:px-2 text-[10px] sm:text-[11px] font-semibold transition border leading-snug",
@@ -149,17 +175,29 @@ export default function SelectPage() {
                 );
               })}
             </div>
+
+            {showErrors && !weather && (
+              <p className="text-[11px] sm:text-xs text-red-500 mt-1">
+                今日の天気を教えてください。
+              </p>
+            )}
           </section>
 
           {/* 決定ボタン */}
-          <div className="pt-2 flex justify-center">
+          <div className="pt-2 flex flex-col items-center gap-2">
             <button
               type="submit"
-              disabled={!time}
+              disabled={hasError}
               className="min-w-[240px] sm:min-w-[260px] rounded-full bg-gradient-to-r from-primary to-primary-border py-3 px-8 sm:py-3.5 sm:px-10 text-sm sm:text-[15px] font-semibold text-white shadow-[0_18px_30px_rgba(232,155,83,0.5)] hover:brightness-105 hover:shadow-[0_20px_36px_rgba(232,155,83,0.65)] disabled:bg-gray-300 disabled:shadow-none disabled:cursor-not-allowed transition"
             >
               この条件でレシピを見る
             </button>
+
+            {showErrors && hasError && (
+              <p className="text-[11px] sm:text-xs text-red-500">
+                すべての項目をえらんでから進んでください。
+              </p>
+            )}
           </div>
         </form>
       </div>
