@@ -6,6 +6,8 @@ import {
   Feedback,
   Mood,
   RecommendationResponse,
+  Personality,
+  Preference,
   User,
 } from "./types";
 
@@ -46,14 +48,17 @@ async function requestJson<T>(
 // ========================
 export async function createUser(params: {
   name: string;
-  personality: string;
-  preference: string;
+  personality: Personality;
+  preference: Preference;
 }): Promise<User> {
+  if (USE_MOCK) return createUserMock(params);
+
   return requestJson<User>("/api/v1/users", {
     method: "POST",
     body: JSON.stringify(params),
   });
 }
+
 
 // ========================
 // 2. POST /api/v1/recommendations
@@ -87,11 +92,14 @@ export async function createActivityLog(params: {
   weather?: string;
   feedback: Feedback;
 }): Promise<ActivityLogCreated> {
+  if (USE_MOCK) return createActivityLogMock(params);
+
   return requestJson<ActivityLogCreated>("/api/v1/activity_logs", {
     method: "POST",
     body: JSON.stringify(params),
   });
 }
+
 
 // ========================
 // 4. GET /api/v1/activity_logs
@@ -119,7 +127,7 @@ async function getActivityLogsMock(): Promise<ActivityLogsResponse> {
   };
 }
 
-async function createRecommendationMock() {
+async function createRecommendationMock(): Promise<RecommendationResponse> {
       await new Promise((resolve) => setTimeout(resolve, 1000)); 
   return {
     recipes: [
@@ -142,6 +150,40 @@ async function createRecommendationMock() {
         description: "今日 or 今週「自分ができたこと」をメモに書く。",
       },
     ],
+  };
+}
+
+async function createUserMock(params: {
+  name: string;
+  personality: Personality;
+  preference: Preference;
+}): Promise<User> {
+  await new Promise((r) => setTimeout(r, 600));
+  return {
+    id: 1, // 仮で固定でもOK（本当は連番っぽくしてもいい）
+    name: params.name,
+    personality: params.personality,
+    preference: params.preference,
+  };
+}
+
+async function createActivityLogMock(params: {
+  recipe_id: number;
+  mood: Mood;
+  duration_min: DurationMin;
+  weather?: string;
+  feedback: Feedback;
+}): Promise<ActivityLogCreated> {
+  await new Promise((r) => setTimeout(r, 600));
+  return {
+    id: 1,
+    user_id: 1,
+    recipe_id: params.recipe_id,
+    mood: params.mood,
+    feedback: params.feedback,
+    duration_min: params.duration_min,
+    weather: params.weather ?? "sunny",
+    executed_at: new Date().toISOString(),
   };
 }
 
