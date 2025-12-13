@@ -1,10 +1,12 @@
 //recipes/page.tsx
 "use client";
-
+import { PageShell } from "@/components/ui/PageShell";
+import { LoadingCard } from "@/components/ui/LoadingCard";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createRecommendation } from "@/lib/api";
 import type { Recipe, DurationMin, Mood } from "@/lib/types";
+
 
 function parseDuration(time?: string | null): DurationMin {
   const n = Number(time);
@@ -27,6 +29,8 @@ export default function RecipesPage() {
   const params = useSearchParams();
   const router = useRouter();
 
+  const [confirming, setConfirming] = useState(false);
+
   const duration = parseDuration(params.get("time"));
   const mood = parseMood(params.get("mood"));
 
@@ -36,48 +40,62 @@ export default function RecipesPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    createRecommendation({
-      duration_min: duration,
-      mood,
-      weather: "sunny",
+  let cancelled = false;
+  setLoading(true);
+  setError(null);
+
+  createRecommendation({
+    duration_min: duration,
+    mood,
+    weather: "sunny",
+  })
+    .then((res) => {
+      if (cancelled) return;
+      setRecipes(res.recipes);
     })
-      .then((res) => {
-        setRecipes(res.recipes);
-        setLoading(false);
-      })
-      .catch(() => {
-        setError("レシピの取得に失敗しました");
-        setLoading(false);
-      });
-  }, [duration, mood]);
-
-  const handleConfirm = () => {
-    if (!selectedRecipeId) return alert("レシピを1つ選んでください");
-
-    const query = new URLSearchParams({
-      recipeId: String(selectedRecipeId),
-      time: String(duration),
-      mood,
+    .catch(() => {
+      if (cancelled) return;
+      setError("レシピの取得に失敗しました");
+    })
+    .finally(() => {
+      if (cancelled) return;
+      setLoading(false);
     });
 
-    router.push(`/review?${query}`);
+  return () => {
+    cancelled = true;
   };
+}, [duration, mood]);
+
+ const handleConfirm = async () => {
+  if (!selectedRecipeId) return alert("レシピを1つ選んでください");
+  if (confirming) return; // 二重押し防止
+
+  setConfirming(true);
+
+  const query = new URLSearchParams({
+    recipeId: String(selectedRecipeId),
+    time: String(duration),
+    mood,
+  });
+
+  // 画面遷移自体は next がやってくれるので try/catch は基本不要
+  router.push(`/review?${query}`);
+};
+
 
   // ローディング
-  if (loading) {
-    return (
-      <main className="min-h-screen bg-gradient-to-b from-bg-grad-start via-bg-grad-mid to-bg-grad-end flex items-center justify-center px-4 py-10">
-        <div className="w-full max-w-[420px] rounded-3xl bg-card-bg shadow-[var(--color-card-shadow)] px-5 py-6 sm:px-6 sm:py-7 text-center">
-          <p className="text-[11px] sm:text-xs font-semibold tracking-[0.25em] text-text-accent mb-3">
-            RECIPE
-          </p>
-          <p className="text-xs sm:text-sm text-text-main/80">
-            おすすめレシピを生成中です…
-          </p>
-        </div>
-      </main>
-    );
-  }
+  
+ if (loading) {
+  return (
+    <PageShell>
+      <LoadingCard
+        title="RECIPE"
+        message="おすすめレシピを生成中です…"
+      />
+    </PageShell>
+  );
+}
 
   // エラー
   if (error) {
@@ -180,19 +198,20 @@ export default function RecipesPage() {
 
         {/* Confirm Button */}
         <div className="text-center pt-4">
-          <button
-            type="button"
-            onClick={handleConfirm}
-            disabled={!selectedRecipeId}
-            className={[
-              "min-w-[240px] sm:min-w-[260px] rounded-full py-3 px-8 sm:py-3.5 sm:px-10 font-semibold text-sm sm:text-[15px] transition",
-              selectedRecipeId
-                ? "bg-gradient-to-r from-primary to-primary-border text-white shadow-[0_18px_30px_rgba(232,155,83,0.5)] hover:brightness-110 hover:shadow-[0_20px_36px_rgba(232,155,83,0.65)]"
-                : "bg-gray-300 text-white cursor-not-allowed",
-            ].join(" ")}
-          >
-            このレシピでレビューへ進む
-          </button>
+         <button
+  type="button"
+  onClick={handleConfirm}
+  disabled={!selectedRecipeId || confirming}
+  className={[
+    "min-w-[240px] sm:min-w-[260px] rounded-full py-3 px-8 sm:py-3.5 sm:px-10 font-semibold text-sm sm:text-[15px] transition",
+    (!selectedRecipeId || confirming)
+      ? "bg-gray-300 text-white cursor-not-allowed"
+      : "bg-gradient-to-r from-primary to-primary-border text-white shadow-[0_18px_30px_rgba(232,155,83,0.5)] hover:brightness-110 hover:shadow-[0_20px_36px_rgba(232,155,83,0.65)]",
+  ].join(" ")}
+>
+  {confirming ? "画面を開いています…" : "このレシピでレビューへ進む"}
+</button>
+
         </div>
       </div>
     </main>

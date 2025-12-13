@@ -11,3 +11,14 @@ declare module "../../../app/nextapi/route.jss" {
   const mod: any;
   export = mod;
 }
+
+// Cover malformed generated import paths seen in .next types (eg: route.jsdations/...)
+declare module "*recommendations/route.jsdations/route.js" {
+  const mod: any;
+  export = mod;
+}
+
+declare module "app/api/v1/recommendations/route.jsdations/route.js" {
+  const mod: any;
+  export = mod;
+}

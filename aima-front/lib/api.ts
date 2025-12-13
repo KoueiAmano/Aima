@@ -14,12 +14,12 @@ import {
 // ========================
 // モック切り替えフラグ
 // ========================
-const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === "true";
+const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === "";
 
 // ========================
 // 共通 requestJson
 // ========================
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+const API_BASE = "";
 console.log("API_BASE =", API_BASE);
 
 async function requestJson<T>(
@@ -47,26 +47,42 @@ async function requestJson<T>(
 // ========================
 // 1. POST /api/v1/users
 // ========================
+// lib/api.ts
+
 export async function createUser(params: {
   name: string;
   personality: Personality;
   preference: Preference;
 }): Promise<User> {
-  if (USE_MOCK) return createUserMock(params);
-
-  return requestJson<User>("/api/v1/users", {
-    method: "POST",
-    body: JSON.stringify(params),
-  });
+  // ✅ ユーザーAPIは存在しない前提にする
+  //    → フロント側だけでダミーユーザー(id=1)を返す
+  return createUserMock(params);
 }
 
 
+
+
+
 // ========================
 // 2. POST /api/v1/recommendations
 // ========================
-// ========================
-// 2. POST /api/v1/recommendations
-// ========================
+// lib/api.ts
+
+type RailsRecommendationResponse = {
+  input: {
+    mood: string;
+    duration_min: number;
+    weather: string | null;
+    category: string;
+  };
+  recommendations: {
+    id: number;
+    title: string;
+    description: string;
+    category: string;
+  }[];
+};
+
 export async function createRecommendation(params: {
   mood: Mood;
   duration_min: DurationMin;
@@ -76,11 +92,26 @@ export async function createRecommendation(params: {
     return createRecommendationMock();
   }
 
-  return requestJson<RecommendationResponse>("/api/v1/recommendations", {
-    method: "POST",
-    body: JSON.stringify(params),
-  });
+  // weather は Rails 側で require しているので、なければ適当なデフォルト渡す
+  const payload = {
+    ...params,
+    weather: params.weather ?? "sunny",
+  };
+
+  const railsRes = await requestJson<RailsRecommendationResponse>(
+    "/api/v1/recommendations",
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }
+  );
+
+  // Rails → フロントの型に変換
+  return {
+    recipes: railsRes.recommendations,
+  };
 }
+
 
 
 // ========================
