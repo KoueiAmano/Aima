@@ -1,8 +1,21 @@
 module Api
   module V1
     class ActivityLogsController < ApplicationController
+      def index
+        user = User.first! # v1: 認証なし固定
+
+        logs = user.activity_logs
+                   .includes(:recipe)
+                   .order(created_at: :desc)
+                   .limit(limit_param)
+
+        render json: {
+          activity_logs: logs.map { |log| serialize_log(log) }
+        }, status: :ok
+      end
+
       def create
-        user = User.first! # v1: 認証なしなので固定ユーザーでOK（seedの User.create! を想定）
+        user = User.first! # v1: 認証なし固定ユーザー
 
         recipe = resolve_recipe!
 
@@ -12,13 +25,19 @@ module Api
           mood: activity_log_params[:mood],
           duration_min: activity_log_params[:duration_min].to_i,
           weather: activity_log_params[:weather],
-          feedback: activity_log_params[:feedback] # 任意（nilなら before_validation で normal ）
+          feedback: activity_log_params[:feedback] # 任意（nilなら before_validation で normal）
         )
 
         render json: serialize_log(log), status: :created
       end
 
       private
+
+      def limit_param
+        n = params[:limit].to_i
+        return 30 if n <= 0
+        [n, 100].min
+      end
 
       # 既存seedの recipe_id でログを作る or AI生成レシピを新規保存してログを作る
       def resolve_recipe!
