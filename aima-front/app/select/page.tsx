@@ -24,6 +24,7 @@ export default function SelectPage() {
    const params = new URLSearchParams({
   duration_min: String(time),
   mood,
+  weather,
 });
 
 router.push(`/recipes?${params.toString()}`);

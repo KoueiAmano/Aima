@@ -15,7 +15,10 @@ import {
 // モック切り替えフラグ
 // ========================
 const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === "true";
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL?.trim() || ""; // 基本は空でOK
+// ブラウザ環境では必ず Next の同一オリジンルートを叩くため、API_BASE は空に固定する。
+// サーバ側（Next route handler）は `process.env.BACKEND_API_BASE_URL` を使って
+// Rails へ中継する設計とする。
+const API_BASE = "";
 
 // ========================
 // 共通 requestJson
@@ -221,14 +224,15 @@ async function createActivityLogMock(params: {
 
 
 // 外から使うのはこの1個だけ
-export async function getActivityLogs(): Promise<ActivityLogsResponse> {
+export async function getActivityLogs(limit?: number): Promise<ActivityLogsResponse> {
   if (USE_MOCK) {
     // バックエンドなしでもここで完結
     return getActivityLogsMock();
   }
 
   // 本番APIを叩く
-  return requestJson<ActivityLogsResponse>("/api/v1/activity_logs", {
+  const path = limit ? `/api/v1/activity_logs?limit=${Number(limit)}` : "/api/v1/activity_logs";
+  return requestJson<ActivityLogsResponse>(path, {
     method: "GET",
   });
 }

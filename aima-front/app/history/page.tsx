@@ -28,7 +28,7 @@ export default function HistoryPage() {
     setLoading(true);
     setError(null);
 
-    getActivityLogs()
+    getActivityLogs(100)
       .then(({ activity_logs }) => setLogs(activity_logs))
       .catch((e) => {
         console.error(e);

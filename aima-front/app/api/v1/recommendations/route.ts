@@ -42,7 +42,6 @@ console.log("BACKEND_BASE_URL =", process.env.BACKEND_BASE_URL);
       headers: {
         "Content-Type":
           backendRes.headers.get("content-type") || "application/json",
-        "Access-Control-Allow-Origin": "*",
       },
     });
   } catch (e) {
@@ -55,13 +54,8 @@ console.log("BACKEND_BASE_URL =", process.env.BACKEND_BASE_URL);
 }
 
 export async function OPTIONS() {
-  // CORS preflight responder for development. Keep permissive for now.
+  // Respond to preflight for same-origin requests (no CORS headers).
   return new NextResponse(null, {
     status: 204,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-    },
   });
 }
