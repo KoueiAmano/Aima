@@ -31,6 +31,7 @@ export default function OnboardingPage() {
       const user = await createUser({ name, personality, preference });
       setUserId(user.id);
       router.replace("/");
+      router.refresh();
     } catch {
       setError("ユーザー登録に失敗しました");
       setLoading(false);

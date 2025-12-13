@@ -21,12 +21,13 @@ export default function SelectPage() {
     setShowErrors(true);
     if (!time || !mood || !weather) return;
 
-    const params = new URLSearchParams({
-      duration_min: String(time),
-      mood,
-    });
+   const params = new URLSearchParams({
+  duration_min: String(time),
+  mood,
+});
 
-    router.push(`/recipes?${params.toString()}`);
+router.push(`/recipes?${params.toString()}`);
+
   };
 
   const hasError = !time || !mood || !weather;

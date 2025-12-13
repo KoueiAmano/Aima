@@ -1,14 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { clearUserId, getUserId } from "@/lib/userStore";
 
 export default function HomePage() {
   const router = useRouter();
-
-  // ✅ 初回のチラ見え防止（判定が終わるまで描画しない）
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
@@ -21,18 +19,19 @@ export default function HomePage() {
   }, [router]);
 
   const handleLogout = () => {
-    // confirmは一旦OK（後で自作モーダルに置換しやすい）
     if (!confirm("ログアウトしますか？")) return;
-
     clearUserId();
-
-    // ✅ 履歴・表示の更新を安定させる
     router.replace("/onboarding");
-    router.refresh();
+    router.refresh(); // 必要なら残す
   };
 
-  // 判定前は描画しない（or ローディングUIに置換してOK）
-  if (!checked) return null;
+  if (!checked) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <p className="text-sm text-text-main/70">読み込み中…</p>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-bg-grad-start via-bg-grad-mid to-bg-grad-end flex items-center justify-center px-4 py-10 sm:py-14 lg:py-12">
@@ -62,7 +61,6 @@ export default function HomePage() {
         </p>
 
         <div className="space-y-5 sm:space-y-6 mb-8 sm:mb-10">
-          {/* ✅ Linkにスタイルを直接付ける（フォーカス/クリックが自然） */}
           <Link
             href="/select"
             className="relative mx-auto flex max-w-[360px] sm:max-w-[380px] lg:max-w-[420px] items-center justify-center gap-2.5 sm:gap-3 rounded-full bg-gradient-to-r from-primary to-primary-border px-10 sm:px-14 py-4 sm:py-5 text-[14px] sm:text-[15px] lg:text-[16px] font-semibold text-white shadow-[0_18px_36px_rgba(232,155,83,0.55)] transition-transform transition-shadow duration-200 hover:brightness-110 hover:translate-y-[1px] hover:shadow-[0_22px_42px_rgba(232,155,83,0.65)]"

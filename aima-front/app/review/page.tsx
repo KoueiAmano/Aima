@@ -2,9 +2,10 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { createActivityLog } from "@/lib/api";
 import type { DurationMin, Mood, Feedback } from "@/lib/types";
+import Link from "next/link";
 
 function parseDuration(time: string | null): DurationMin {
   const n = Number(time);
@@ -34,67 +35,73 @@ export default function ReviewPage() {
   const params = useSearchParams();
 
   const recipeIdParam = params.get("recipeId");
-  const timeParam = params.get("time");
+  const durationParam = params.get("duration_min");
   const moodParam = params.get("mood");
 
-  // ❌ パラメータ不足時
-  if (!recipeIdParam) {
+  // ✅ hook は先に宣言しておく（将来の安全性）
+  const [selectedFeedback, setSelectedFeedback] = useState<Feedback | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // ✅ パラメータをメモ化（毎レンダーで再計算しない）
+  const recipeId = useMemo(() => Number(recipeIdParam), [recipeIdParam]);
+  const duration = useMemo(() => parseDuration(durationParam), [durationParam]);
+  const mood = useMemo(() => parseMood(moodParam), [moodParam]);
+
+  const hasValidRecipeId = Number.isFinite(recipeId) && recipeId > 0;
+
+  // ❌ パラメータ不足 or 変な値
+  if (!recipeIdParam || !hasValidRecipeId) {
     return (
       <main className="min-h-screen bg-gradient-to-b from-bg-grad-start via-bg-grad-mid to-bg-grad-end flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-[420px] rounded-3xl bg-card-bg shadow-[var(--color-card-shadow)] px-6 py-8 text-center space-y-4 backdrop-blur-[2px]">
           <h1 className="text-lg font-semibold text-text-header">評価画面</h1>
           <p className="text-sm text-text-main/80">レシピが選択されていません。</p>
-          <button
-            onClick={() => router.push("/")}
-            className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-primary to-primary-border px-6 py-2.5 text-sm font-semibold text-white shadow-[0_14px_26px_rgba(232,155,83,0.5)] hover:brightness-105 transition"
-          >
-            ホームに戻る
-          </button>
+          <Link
+  href="/"
+  className="self-start sm:self-auto text-[11px] sm:text-xs text-text-main/70 underline-offset-2 hover:underline"
+>
+  ホームにもどる
+</Link>
         </div>
       </main>
     );
   }
 
-  // パラメータの実体化
-  const recipeId = Number(recipeIdParam);
-  const duration = parseDuration(timeParam);
-  const mood = parseMood(moodParam);
-
-  const [selectedFeedback, setSelectedFeedback] = useState<Feedback | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
   const handleSubmit = async () => {
-    if (!selectedFeedback) {
-      alert("評価を選んでください");
-      return;
-    }
+  if (!selectedFeedback) {
+    alert("評価を選んでください");
+    return;
+  }
 
-    setSubmitting(true);
-    setError(null);
+  setSubmitting(true);
+  setError(null);
 
-    try {
-      await createActivityLog({
-        recipe_id: recipeId,
-        mood,
-        duration_min: duration,
-        weather: "sunny",
-        feedback: selectedFeedback,
-      });
+  try {
+    await createActivityLog({
+      recipe_id: recipeId,
+      mood,
+      duration_min: duration,
+      weather: "sunny",
+      feedback: selectedFeedback,
+    });
+     router.replace("/");
+  router.refresh();
+  
+  } catch (e) {
+    console.error(e);
+    setError("送信に失敗しました。時間をおいて再度お試しください。");
+  } finally {
+    setSubmitting(false); // 失敗時にボタン戻らない事故を防ぐ
+  }
+};
 
-      router.push("/");
-    } catch (e) {
-      console.error(e);
-      setError("送信に失敗しました。時間をおいて再度お試しください。");
-      setSubmitting(false);
-    }
-  };
 
+ 
   return (
     <main className="min-h-screen bg-gradient-to-b from-bg-grad-start via-bg-grad-mid to-bg-grad-end flex items-center justify-center px-4 py-10 sm:py-14 lg:py-12">
       <div className="w-full max-w-[520px] md:max-w-[600px] lg:max-w-[680px] rounded-3xl bg-card-bg shadow-[var(--color-card-shadow)] px-6 sm:px-7 lg:px-8 py-7 sm:py-8 space-y-6 sm:space-y-7 backdrop-blur-[2px]">
-        
-        {/* ヘッダー */}
+
         <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="space-y-1">
             <p className="text-[10px] sm:text-[11px] font-semibold tracking-[0.2em] text-text-accent uppercase">
@@ -107,14 +114,13 @@ export default function ReviewPage() {
 
           <button
             type="button"
-            onClick={() => router.push("/")}
+            onClick={() => router.replace("/")}
             className="self-start sm:self-auto text-[11px] sm:text-xs text-text-main/70 underline-offset-2 hover:underline"
           >
             ホームにもどる
           </button>
         </header>
 
-        {/* CONDITION */}
         <section className="space-y-2">
           <p className="text-[10px] sm:text-xs font-semibold text-text-accent tracking-[0.18em] uppercase">
             CONDITION
@@ -126,7 +132,6 @@ export default function ReviewPage() {
           </div>
         </section>
 
-        {/* FEEDBACK */}
         <section className="space-y-3">
           <p className="text-[10px] sm:text-xs font-semibold text-text-accent tracking-[0.18em] uppercase">
             FEEDBACK
@@ -156,14 +161,12 @@ export default function ReviewPage() {
           </div>
         </section>
 
-        {/* エラー */}
         {error && (
           <p className="text-xs sm:text-sm text-red-500 bg-red-50 border border-red-100 rounded-xl px-3 py-2">
             {error}
           </p>
         )}
 
-        {/* SUBMIT */}
         <div className="pt-2 flex justify-center">
           <button
             type="button"
