@@ -8,7 +8,8 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       get "health", to: "health#show"
-      resources :recommendations, only: :create
+      resources :recommendations, only: [:create]
+      resources :activity_logs, only: [:create]
     end
   end
 
