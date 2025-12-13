@@ -14,13 +14,12 @@ import {
 // ========================
 // モック切り替えフラグ
 // ========================
-const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === "";
+const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === "true";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL?.trim() || ""; // 基本は空でOK
 
 // ========================
 // 共通 requestJson
 // ========================
-const API_BASE = "";
-console.log("API_BASE =", API_BASE);
 
 async function requestJson<T>(
   path: string,
@@ -43,6 +42,7 @@ async function requestJson<T>(
 
   return res.json();
 }
+
 
 // ========================
 // 1. POST /api/v1/users
