@@ -41,7 +41,7 @@ export default function SelectPage() {
           {/* STEP 1 */}
           <section className="space-y-2">
             <p className="step-label">STEP 1</p>
-            <p className="step-text">今の余白時間はどれくらい？</p>
+            <p className="step-text">今、どれくらい時間ある？</p>
 
             <OptionGrid
               options={timeOptions.map((t) => ({ id: t, label: `${t}分` }))}

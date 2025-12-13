@@ -1,4 +1,4 @@
-// lib/options.ts
+// lib/options.ts１
 import type { Personality, Preference, Mood, Weather } from "./types";
 
 export const timeOptions = [15, 30, 60] as const;

@@ -2,7 +2,7 @@ nodejs:  v24.11.1
 
 
 インストール：npx create-next-app aima-front
-npm install -D tailwindcss postcss autoprefixer
+ npm i -D tailwindcss
 
 
 "next": "16.0.7",
