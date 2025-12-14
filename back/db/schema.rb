@@ -14,10 +14,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_12_162443) do
   create_table "activity_logs", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "recipe_id", null: false
-    t.integer "mood"
-    t.integer "feedback"
-    t.integer "weather"
-    t.integer "duration_min"
+    t.integer "mood", null: false
+    t.integer "feedback", default: 1, null: false
+    t.integer "weather", null: false
+    t.integer "duration_min", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["recipe_id"], name: "index_activity_logs_on_recipe_id"
@@ -25,17 +25,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_12_162443) do
   end
 
   create_table "recipes", force: :cascade do |t|
-    t.string "title"
-    t.integer "category"
-    t.text "description"
+    t.string "title", null: false
+    t.integer "category", null: false
+    t.text "description", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "name"
-    t.integer "personality"
-    t.integer "preference"
+    t.string "name", default: "guest"
+    t.integer "personality", default: 1, null: false
+    t.integer "preference", default: 1, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

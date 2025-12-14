@@ -1,5 +1,23 @@
-// app/review/page.tsx
-"use client";
+// aima-front/app/review/page.tsx
+import { Suspense } from "react";
+import ReviewClient from "./ReviewClient";
+
+type SearchParams = { [key: string]: string | string[] | undefined };
+
+export default function ReviewPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const recipeIdParam = Array.isArray(searchParams.recipeId)
+    ? searchParams.recipeId[0]
+    : searchParams.recipeId ?? null;
+  const timeParam = Array.isArray(searchParams.time)
+    ? searchParams.time[0]
+    : searchParams.time ?? null;
+  const moodParam = Array.isArray(searchParams.mood)
+    ? searchParams.mood[0]
+    : searchParams.mood ?? null;
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useMemo, useState } from "react";
@@ -99,88 +117,12 @@ function ReviewContent() {
 
  
   return (
-    <main className="min-h-screen bg-gradient-to-b from-bg-grad-start via-bg-grad-mid to-bg-grad-end flex items-center justify-center px-4 py-10 sm:py-14 lg:py-12">
-      <div className="w-full max-w-[520px] md:max-w-[600px] lg:max-w-[680px] rounded-3xl bg-card-bg shadow-[var(--color-card-shadow)] px-6 sm:px-7 lg:px-8 py-7 sm:py-8 space-y-6 sm:space-y-7 backdrop-blur-[2px]">
-
-        <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="space-y-1">
-            <p className="text-[10px] sm:text-[11px] font-semibold tracking-[0.2em] text-text-accent uppercase">
-              REVIEW
-            </p>
-            <h1 className="text-base sm:text-lg lg:text-xl font-semibold text-text-header">
-              今回のレシピの評価
-            </h1>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => router.replace("/")}
-            className="self-start sm:self-auto text-[11px] sm:text-xs text-text-main/70 underline-offset-2 hover:underline"
-          >
-            ホームにもどる
-          </button>
-        </header>
-
-        <section className="space-y-2">
-          <p className="text-[10px] sm:text-xs font-semibold text-text-accent tracking-[0.18em] uppercase">
-            CONDITION
-          </p>
-
-          <div className="rounded-2xl bg-white/80 border border-primary-light px-4 py-3 text-left text-xs sm:text-[13px] text-text-main/90 space-y-1">
-            <p><span className="font-semibold">時間：</span>{duration} 分</p>
-            <p><span className="font-semibold">気分：</span>{moodLabel[mood]}</p>
-          </div>
-        </section>
-
-        <section className="space-y-3">
-          <p className="text-[10px] sm:text-xs font-semibold text-text-accent tracking-[0.18em] uppercase">
-            FEEDBACK
-          </p>
-
-          <p className="text-sm sm:text-base text-text-main">今回のレシピ、どうだった？</p>
-
-          <div className="flex flex-wrap gap-3">
-            {feedbackOptions.map((opt) => {
-              const selected = selectedFeedback === opt.id;
-              return (
-                <button
-                  key={opt.id}
-                  type="button"
-                  onClick={() => setSelectedFeedback(opt.id)}
-                  className={[
-                    "rounded-full px-4 py-2 text-xs sm:text-[13px] font-semibold transition border",
-                    selected
-                      ? "bg-primary-border/95 border-primary-border text-white shadow-md"
-                      : "bg-white/80 border-primary-light text-text-main hover:bg-primary-light/60",
-                  ].join(" ")}
-                >
-                  {opt.label}
-                </button>
-              );
-            })}
-          </div>
-        </section>
-
-        {error && (
-          <p className="text-xs sm:text-sm text-red-500 bg-red-50 border border-red-100 rounded-xl px-3 py-2">
-            {error}
-          </p>
-        )}
-
-        <div className="pt-2 flex justify-center">
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={submitting}
-            className={`min-w-[240px] sm:min-w-[260px] rounded-full py-3 px-8 sm:py-3.5 sm:px-10 text-sm sm:text-[15px] font-semibold transition ${
-              submitting
-                ? "bg-gray-300 text-white shadow-none cursor-default"
-                : "bg-gradient-to-r from-primary to-primary-border text-white shadow-[0_18px_30px_rgba(232,155,83,0.5)] hover:brightness-105 hover:shadow-[0_20px_36px_rgba(232,155,83,0.65)]"
-            }`}
-          >
-            {submitting ? "送信中..." : "この評価で保存する"}
-          </button>
-        </div>
+    <main className="min-h-screen bg-gradient-to-b from-bg-grad-start via-bg-grad-mid to-bg-grad-end flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-[420px] rounded-3xl bg-card-bg shadow-[var(--color-card-shadow)] px-6 py-8 text-center space-y-3">
+        <p className="text-[11px] font-semibold tracking-[0.2em] text-text-accent uppercase">
+          REVIEW
+        </p>
+        <p className="text-sm text-text-main/80">読み込み中...</p>
       </div>
     </main>
   );
