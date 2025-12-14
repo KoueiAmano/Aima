@@ -252,8 +252,8 @@ export async function checkHealth(): Promise<HealthCheckResponse> {
   }
 
   // ✅ ここは API_BASE 経由にしない！
-  // ブラウザからは Next の Route Handler (/api/v1/health) だけ叩く
-  const res = await fetch("/api/v1/health", {
+  // ブラウザからは Next の Route Handler (/api/health) だけ叩く
+  const res = await fetch("/api/health", {
     method: "GET",
     cache: "no-store",
     headers: {
