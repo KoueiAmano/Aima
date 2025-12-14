@@ -2,7 +2,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { createActivityLog } from "@/lib/api";
 import type { DurationMin, Mood, Feedback } from "@/lib/types";
 import Link from "next/link";
@@ -30,7 +30,7 @@ const moodLabel: Record<Mood, string> = {
   calm: "ゆっくり落ち着きたい",
 };
 
-export default function ReviewPage() {
+function ReviewContent() {
   const router = useRouter();
   const params = useSearchParams();
 
@@ -183,5 +183,17 @@ export default function ReviewPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function ReviewPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-gradient-to-b from-bg-grad-start via-bg-grad-mid to-bg-grad-end flex items-center justify-center">
+        <div className="text-text-main">読み込み中...</div>
+      </main>
+    }>
+      <ReviewContent />
+    </Suspense>
   );
 }
