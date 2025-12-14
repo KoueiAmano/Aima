@@ -2,10 +2,30 @@
 import { Suspense } from "react";
 import ReviewClient from "./ReviewClient";
 
-export default function ReviewPage() {
+type SearchParams = { [key: string]: string | string[] | undefined };
+
+export default function ReviewPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const recipeIdParam = Array.isArray(searchParams.recipeId)
+    ? searchParams.recipeId[0]
+    : searchParams.recipeId ?? null;
+  const timeParam = Array.isArray(searchParams.time)
+    ? searchParams.time[0]
+    : searchParams.time ?? null;
+  const moodParam = Array.isArray(searchParams.mood)
+    ? searchParams.mood[0]
+    : searchParams.mood ?? null;
+
   return (
     <Suspense fallback={<ReviewLoading />}>
-      <ReviewClient />
+      <ReviewClient
+        recipeIdParam={recipeIdParam}
+        timeParam={timeParam}
+        moodParam={moodParam}
+      />
     </Suspense>
   );
 }

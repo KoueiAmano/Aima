@@ -1,7 +1,7 @@
 // aima-front/app/review/ReviewClient.tsx
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createActivityLog } from "@/lib/api";
 import type { DurationMin, Mood, Feedback } from "@/lib/types";
@@ -29,13 +29,16 @@ const moodLabel: Record<Mood, string> = {
   calm: "ゆっくり落ち着きたい",
 };
 
-export default function ReviewClient() {
+export default function ReviewClient({
+  recipeIdParam,
+  timeParam,
+  moodParam,
+}: {
+  recipeIdParam: string | null;
+  timeParam: string | null;
+  moodParam: string | null;
+}) {
   const router = useRouter();
-  const params = useSearchParams();
-
-  const recipeIdParam = params.get("recipeId");
-  const timeParam = params.get("time");
-  const moodParam = params.get("mood");
 
   // ❌ パラメータ不足時
   if (!recipeIdParam) {
