@@ -13,6 +13,7 @@ export async function POST(req: Request) {
     // フロントから来た JSON をそのまま Rails に中継したいので text として読む
     const bodyText = await req.text();
 console.log("[recommendations route] proxy to:", `${BACKEND_BASE}/api/v1/recommendations`);
+console.log("[recommendations route] body:", bodyText);
 
     const backendRes = await fetch(`${BACKEND_BASE}/api/v1/recommendations`, {
       method: "POST",
