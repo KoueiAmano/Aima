@@ -4,20 +4,22 @@ import ReviewClient from "./ReviewClient";
 
 type SearchParams = { [key: string]: string | string[] | undefined };
 
-export default function ReviewPage({
+export default async function ReviewPage({
   searchParams,
 }: {
-  searchParams: SearchParams;
+  searchParams: Promise<SearchParams>;
 }) {
-  const recipeIdParam = Array.isArray(searchParams.recipeId)
-    ? searchParams.recipeId[0]
-    : searchParams.recipeId ?? null;
-  const timeParam = Array.isArray(searchParams.time)
-    ? searchParams.time[0]
-    : searchParams.time ?? null;
-  const moodParam = Array.isArray(searchParams.mood)
-    ? searchParams.mood[0]
-    : searchParams.mood ?? null;
+  const { recipeId, time, mood } = await searchParams;
+
+  const recipeIdParam = Array.isArray(recipeId)
+    ? recipeId[0]
+    : recipeId ?? null;
+  const timeParam = Array.isArray(time)
+    ? time[0]
+    : time ?? null;
+  const moodParam = Array.isArray(mood)
+    ? mood[0]
+    : mood ?? null;
 
   return (
     <Suspense fallback={<ReviewLoading />}>
