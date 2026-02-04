@@ -1,0 +1,23 @@
+name: Ready For Review Notification
+
+on:
+  pull_request:
+    types: [opend,ready_for_review]
+
+jobs:
+  notify:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Discord Notification
+        uses: appleboy/discord-action@master
+        with:
+          url: ${{secrets.DISCORD_WEBHOOK}}
+          username: "Github Actions Bot"
+          color: "#48f542"
+          message: |
+            Pull Request #${{ github.event.pull_request.number }} is ready for review!
+            **タイトル**: ${{ github.event.pull_request.title }}
+            ** 作成者**: ${{ github.event.pull_request.user.login }}
+            ** PR番号 **: ${{ github.event.pull_request.number }}
+            ** リンク**: ${{ github.event.pull_request.html_url }}
