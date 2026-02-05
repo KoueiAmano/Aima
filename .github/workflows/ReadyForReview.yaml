@@ -12,7 +12,7 @@ jobs:
       - name: Discord Notification
         uses: appleboy/discord-action@master
         with:
-          url: ${{secrets.DISCORD_WEBHOOK}}
+          webhook_url: ${{secrets.DISCORD_WEBHOOK}}
           username: "Github Actions Bot"
           color: "#48f542"
           message: |
