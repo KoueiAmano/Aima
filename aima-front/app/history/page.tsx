@@ -1,5 +1,5 @@
 "use client";
-
+// テストコメント
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getActivityLogs } from "@/lib/api";
