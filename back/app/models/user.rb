@@ -1,6 +1,9 @@
 class User < ApplicationRecord
     enum :personality, { energetic: 0, neutral: 1, calm: 2 }
     enum :preference,  { outdoor: 0, both: 1, indoor: 2 }
+    enum :role, { user: 0, admin: 1 }
+
+    has_secure_password
 
     before_validation :set_defaults, on: :create
 
