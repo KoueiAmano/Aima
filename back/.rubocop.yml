@@ -1,8 +1,17 @@
-# Omakase Ruby styling for Rails
-inherit_gem: { rubocop-rails-omakase: rubocop.yml }
+require:
+- rubocop-rails
+- rubocop-performance
 
-# Overwrite or add rules to create your own house style
-#
-# # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
-# Layout/SpaceInsideArrayLiteralBrackets:
-#   Enabled: false
+AllCops:
+  NewCops: enable
+  Exclude:
+    - 'db/schema.rb'
+    - 'db/migrate/*'
+    - 'bin/*'
+    - 'config/environments/*'
+    - 'vendor/**/*'
+    - 'node_modules/**/*'
+Metrics/BlockLength:
+  Max: 20
+Style/Documentation:
+  Enabled: false
