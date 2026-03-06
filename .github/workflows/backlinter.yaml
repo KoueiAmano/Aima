@@ -1,0 +1,27 @@
+name: Backend Linter
+
+on: 
+  push:
+    paths:
+      - 'back/**'
+  pull_request:
+    paths:
+      - 'back/**'
+  workflow_dispatch:
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    defaults:
+      run:
+        working-directory: back
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3.10'
+          bundler-cache: true
+      - name: Run RuboCop
+        run: bundle exec rubocop
