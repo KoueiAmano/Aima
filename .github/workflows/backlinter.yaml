@@ -23,5 +23,6 @@ jobs:
         with:
           ruby-version: '3.3.10'
           bundler-cache: true
+          working-directory: back
       - name: Run RuboCop
         run: bundle exec rubocop
