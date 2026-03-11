@@ -40,6 +40,15 @@ export default function ReviewClient({
 }) {
   const router = useRouter();
 
+
+  const recipeId = Number(recipeIdParam);
+  const duration = parseDuration(timeParam);
+  const mood = parseMood(moodParam);
+
+  const [selectedFeedback, setSelectedFeedback] = useState<Feedback | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
   // ❌ パラメータ不足時
   if (!recipeIdParam) {
     return (
@@ -58,13 +67,7 @@ export default function ReviewClient({
     );
   }
 
-  const recipeId = Number(recipeIdParam);
-  const duration = parseDuration(timeParam);
-  const mood = parseMood(moodParam);
-
-  const [selectedFeedback, setSelectedFeedback] = useState<Feedback | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  
 
   const handleSubmit = async () => {
     if (!selectedFeedback) {
