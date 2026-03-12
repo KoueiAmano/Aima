@@ -25,9 +25,6 @@ export default function HistoryPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setLoading(true);
-    setError(null);
-
     getActivityLogs(100)
       .then(({ activity_logs }) => setLogs(activity_logs))
       .catch((e) => {

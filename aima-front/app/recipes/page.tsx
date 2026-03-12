@@ -4,7 +4,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createRecommendation } from "@/lib/api";
-import type { Recipe, DurationMin, Mood } from "@/lib/types";
+import type { Recipe, DurationMin, Mood, Weather } from "@/lib/types";
 
 function parseDuration(v: string | null): DurationMin {
   const n = Number(v);
@@ -12,6 +12,9 @@ function parseDuration(v: string | null): DurationMin {
 }
 function parseMood(v: string | null): Mood {
   return v === "energetic" || v === "neutral" || v === "calm" ? v : "neutral";
+}
+function parseWeather(v: string | null): Weather {
+  return v === "sunny" || v === "rainy" || v === "cloudy" ? v : "sunny";
 }
 
 const moodLabel: Record<Mood, string> = {
@@ -30,10 +33,7 @@ export default function RecipesPage() {
     [params]
   );
   const mood = useMemo(() => parseMood(params.get("mood")), [params]);
-  const weather = useMemo(
-    () => (params.get("weather") as import("@/lib/types").Weather) ?? "sunny",
-    [params]
-  );
+  const weather = useMemo(() => parseWeather(params.get("weather")), [params]);
 
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,28 +43,33 @@ export default function RecipesPage() {
   useEffect(() => {
     let cancelled = false;
 
-    setLoading(true);
-    setError(null);
-    setSelectedRecipeId(null);
+    const fetchRecipes = async () => {
+      setLoading(true);
+      setError(null);
+      setSelectedRecipeId(null);
 
-    createRecommendation({ duration_min: duration, mood, weather })
-      .then((res) => {
-        if (cancelled) return;
-        setRecipes(res.recipes);
-      })
-      .catch(() => {
-        if (cancelled) return;
-        setError("レシピの取得に失敗しました");
-      })
-      .finally(() => {
-        if (cancelled) return;
-        setLoading(false);
-      });
+      try {
+        const res = await createRecommendation({ duration_min: duration, mood, weather });
+        if (!cancelled) {
+          setRecipes(res.recipes);
+        }
+      } catch {
+        if (!cancelled) {
+          setError("レシピの取得に失敗しました");
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void fetchRecipes();
 
     return () => {
       cancelled = true;
     };
-  }, [duration, mood]);
+  }, [duration, mood, weather]);
 
   const goReview = () => {
     if (!selectedRecipeId) return;
