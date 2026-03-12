@@ -10,12 +10,24 @@ export default function HomePage() {
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
-    const id = getUserId();
-    if (!id) {
-      router.replace("/onboarding");
-      return;
-    }
-    setChecked(true);
+    let cancelled = false;
+
+    const checkAuth = async () => {
+      const id = await getUserId();
+      if (!id) {
+        router.replace("/onboarding");
+        return;
+      }
+      if (!cancelled) {
+        setChecked(true);
+      }
+    };
+
+    void checkAuth();
+
+    return () => {
+      cancelled = true;
+    };
   }, [router]);
 
   const handleLogout = () => {
